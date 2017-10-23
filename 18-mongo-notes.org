@@ -1,0 +1,48 @@
+#+TITLE:     All the News That's fit to Scrape - Week 18 homework
+#+AUTHOR:    Jeff Romine
+#+EMAIL:     jromineut@gmail.com
+#+DATE:      2017-06-06 Tue
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+OPTIONS: ^:{} author:nil email:nil creator:nil timestamp:nil
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
+#+STARTUP: showeverything
+
+
+[[file:~/src/bootcamp/bootcamp-repo/FSF-Content/01-Class-Content/18-mongo-mongoose/02-Homework/Instructions/homework_instructions.md][file:~/src/bootcamp/bootcamp-repo/FSF-Content/01-Class-Content/18-mongo-mongoose/02-Homework/Instructions/homework_instructions.md]]
+
+Home/Saved Articles/SCRAPE NEW ARTICLES
+
+** Stories
+
+*** Scrape new articles
+
+Adds 20 scraped articles
+
+The list appears underneath the hero image.
+
+I can then scroll down and save articles from the 20 item list.
+
+When saved the articles disappear from the list.
+
+
+***  Saved Articles
+
+Items appear in a similar list structure with [ARTICLE NOTES] and [DELETE FROM SAVED] buttons.
+
+**** [ARTICLE NOTES] brings up a modal with the title "Notes For Article: <mongo id?>
+
+The contents of the modal includes the list of notes and a new note text box
+
+
+***** Delete article note
+
+**** DELETE SAVED ARTICLE
