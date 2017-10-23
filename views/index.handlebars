@@ -1,13 +1,19 @@
 {{#if articles}}
-<div class="container-fluid">
-    <table class="table-striped">
+  <div class="container-fluid">
+    <div class="row">
+      <table class="table-striped col-lg-12">
         <tbody class="table-hover">
-        {{#each articles}}
+          {{#each articles}}
             <tr>
-                <td class="text-left"><a href="{{this.url}}"><h2 id="{{this.id}}">{{this.headline}}<h2></a></td>
+              <td class="headline text-center"><p><a href="{{url}}"><h2 id="{{id}}">{{headline}}</h2></a></p>
+              {{#if summary}}
+                <p class="summary">{{summary}}</p>
+              {{/if}}
+              </td>
             </tr>
-        {{/each}}
+          {{/each}}
         </tbody>
-    </table>
-</div>
+      </table>
+    </div>
+  </div>
 {{/if}}

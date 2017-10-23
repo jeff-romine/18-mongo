@@ -8,7 +8,7 @@ var cheerio = require("cheerio");
 
 
 
-router.get("/all", (req, res) => {
+router.get("/saved", (req, res) => {
 
   Article.find({}).exec((err,articles) => {
     if (err) {
@@ -17,6 +17,7 @@ router.get("/all", (req, res) => {
     else {
       console.log(JSON.stringify(articles,null,2));
       res.json(articles);
+      res.render("saved", {savedArticles: articles});
     }
   });
 });
@@ -30,16 +31,23 @@ router.get("/", (req,res)  => {
 
     var articles = [];
 
-    $("#top-news article .story-heading").slice(0,20).each(function(i, element) {
+    $("#top-news article").slice(0,20).each(function(i, element) {
 
-      var headline = $(element).text().trim();
+      var $storyHeading=$(element).find(".story-heading");
 
-      var url = $(element).find("a").attr("href");
+      var headline = $storyHeading.text().trim();
+
+      var url = $storyHeading.find("a").attr("href");
+
+      var $summary = $(element).find(".summary");
+
+      var summaryText = $summary.text();
 
     articles.push({
         i: i,
         headline: headline,
-        url: url
+      url: url,
+      summary: summaryText
       });
     });
 
