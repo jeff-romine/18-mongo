@@ -1,13 +1,22 @@
-{{#if savedArticles}}
-<div class="container-fluid">
-    <table class="table-striped">
-        <tbody class="table-hover">
-        {{#each savedArticles}}
+{{#if articles}}
+  <div class="container-fluid">
+    <div class="row">
+      <table class="table-striped col-lg-12">
+        <tbody id="articles">
+        {{#each articles}}
             <tr>
-                <td class="text-left"><a href="{{this.url}}"><h2 id="{{this.id}}">{{this.headline}}</h2></a></td>
+              <td class="headline text-center">
+                <div class="headline"><a href="{{url}}"><h2 id="{{id}}">{{headline}}</h2></a>
+                  <button type="button" class="btn btn-primary save-button">Save Article</button>
+                </div>
+                {{#if summary}}
+                  <p class="summary">{{summary}}</p>
+                {{/if}}
+              </td>
             </tr>
         {{/each}}
         </tbody>
-    </table>
-</div>
+      </table>
+    </div>
+  </div>
 {{/if}}

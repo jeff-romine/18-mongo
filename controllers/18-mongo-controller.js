@@ -6,201 +6,120 @@ var Article = require("../models/article");
 var request = require("request");
 var cheerio = require("cheerio");
 
+const chainPromises = (promises, promiseCallback, finalCallback) => {
+  const promise = promises.pop();
+  if (promise) {
+    promise.promise.then((result) => {
+        promiseCallback(
+          result,
+          promise.article,
+          () => {
+            chainPromises(promises, promiseCallback, finalCallback);
+          });
+      }
+    );
+  }
+  else {
+    finalCallback();
+  }
+}
 
+const promiseCallback = (article, articleData, callback) => {
+  if (!article) {
+    var newArticle = new Article(articleData);
+    newArticle.save()
+      .then((article) => {
+      console.log("article saved: " + JSON.stringify(article, null, 2));
+      callback();
+    })
+      .catch((error) => {
+        console.error("unable to save article", articleData, error);
+        callback();
+      });
+  }
+  else {
+    callback();
+  }
+}
 
-router.get("/saved", (req, res) => {
+const scrape = (finalCallback) => {
+  request("https://www.nytimes.com", (error, response, html) => {
 
-  Article.find({}).exec((err,articles) => {
-    if (err) {
-      console.error("error in /all: " + err);
+    if (error) {
+      console.error("error",error);
+      finalCallback();
+      return;
     }
-    else {
-      console.log(JSON.stringify(articles,null,2));
-      res.json(articles);
-      res.render("saved", {savedArticles: articles});
-    }
-  });
-});
-
-
-router.get("/", (req,res)  => {
-
-  request("https://www.nytimes.com", function(error, response, html) {
 
     var $ = cheerio.load(html);
-
-    var articles = [];
-
-    $("#top-news article").slice(0,20).each(function(i, element) {
-
-      var $storyHeading=$(element).find(".story-heading");
-
+    var promises = [];
+    $("#top-news article").slice(0, 30).each((i,element) => {
+      var $storyHeading = $(element).find(".story-heading");
       var headline = $storyHeading.text().trim();
 
       var url = $storyHeading.find("a").attr("href");
 
       var $summary = $(element).find(".summary");
 
-      var summaryText = $summary.text();
+      var summary = $summary.text();
 
-    articles.push({
-        i: i,
-        headline: headline,
-      url: url,
-      summary: summaryText
-      });
+      var promise = {
+        promise: Article.findOne({headline: headline}).exec(),
+        article: {
+          headline: headline,
+          url: url,
+          summary: summary
+        }
+      };
+      promises.push(promise);
     });
+    console.log(promises);
+    chainPromises(promises, promiseCallback, finalCallback);
+  });
+}
 
-    console.log(JSON.stringify(articles,null,2));
+router.get("/", (req, res) => {
 
-    res.render("index", {articles: articles});
+  Article
+    .find({saved: false})
+    .limit(20)
+    .sort('-createdAt')
+    .then((articles) => {
+        res.render("index", {articles: articles});
+      }
+    );
+});
+
+router.get("/saved", (req, res) => {
+  Article
+    .find({saved: true})
+    .limit(20)
+    .sort('-updatedAt')
+    .then((articles) => {
+        res.render("saved", {articles: articles});
+      }
+    );
+});
+
+router.get("/scrape", (req, res) => {
+  scrape( () => res.redirect("/"));
+});
+
+router.put("/save/:id", (req, res) => {
+  "use strict";
+  const id = req.params.id;
+  console.log("id:",id);
+
+  Article.findByIdAndUpdate(id,{saved: true}).then(
+    (result) => {
+    console.log("saved",result);
+    res.redirect("/");
+    }
+  ).catch((err) => {
+    console.log("unable to update article with id=", id);
+    res.redirect("/");
   });
 });
-// app.post("/submit", function (req, res) {
-
-//   var article = new Article(req.body);
-
-//   // save a article to our mongoDB
-//   article.save(function (error, doc) {
-//     // send an error to the browser
-//     if (error) {
-//       res.send(error);
-//     }
-//     // or send the doc to our browser
-//     else {
-//       res.send(doc);
-//     }
-//   });
-// });
-
-// router.get("/search", function (req, res) {
-//     db.Character.findAll({
-//       order: [sequelize.col("house"),sequelize.col("dateOfBirth"),sequelize.col("name")]
-
-//     }).then(function (characters) {
-//           res.render("index", {characters: characters});
-//       });
-//   });
-
-// // Create all our routes and set up logic within those routes where required.
-// router.get("/search/:search?", function (req, res) {
-//   const search=req.params.search;
-
-//   if (search && (search.length > 0)) {
-
-//     var query = [
-//       "SELECT * FROM Characters WHERE MATCH (name,house,mother,father,titles,books)",
-//       "AGAINST ('" + search + "' IN BOOLEAN MODE)"
-//     ].join("\n");
-
-//     db.sequelize.query(query,{type: db.sequelize.QueryTypes.SELECT})
-//       .then(function (characters) {
-//         res.render("index", {characters: characters});
-//       });
-//   }
-//   else {
-//     res.render("index", {characters: []});
-//   }
-// });
-
-
-// router.post("/search/:search?", function (req, res) {
-//   console.log(JSON.stringify(req.body,null,2));
-//   const searchTerms = req.body.searchTerms;
-//     res.redirect("/search/" + (searchTerms || ""));
-// });
-
-// // New get for the character page.
-// router.get("/character/:name", function (req, res) {
-//     db.Character.findOne({
-//         where: {
-//             name: req.params.name
-//         }
-//     }).then(function (character) {
-//         console.log(JSON.stringify(character, null, 2));
-//         res.render("character", { character: character });
-//     });
-// });
-
-// // Edit Character route.
-// router.get("/character/edit/:name", function (req, res) {
-//     db.Character.findOne({
-//         where: {
-//             name: req.params.name
-//         }
-//     }).then(function (character) {
-//         res.render("edit", { character: character });
-//     });
-// });
-
-// router.post("/", function (req, res) {
-//     // db.Burger.create({burger_name: req.body.burger_name})
-//     //     .then(() => res.redirect("/"));
-// });
-
-
-// // PUT to update a character.
-// router.put("/character/update/:name", function (req, res) {
-//     console.log("THIS IS REQ.BODY" , req.body);
-//     var address = req.body.imageLink;
-//     var includes = address.includes("https://api.got.show/https:");
-//     var image_Link = includes ? address.split("https://api.got.show/") : address;
-
-//     db.Character.update({
-//         titles: req.body.titles,
-//         house: req.body.house,
-//         mother: req.body.mother,
-//         father: req.body.father,
-//         books: req.body.books,
-//         description: req.body.description,
-//         imageLink: image_Link
-//     },
-//     {
-//         where: {
-//             name: req.params.name
-//         }
-//     }).then(() => res.redirect("/character/" + req.params.name));
-
-// });
-
-// router.delete("/:id", function (req, res) {
-//     // burger.delete(
-//     //     req.params.id,
-//     //     () => res.redirect("/"));
-// });
-
-// // Route for contact us page.
-// router.get("/contactUs", function(req, res){
-//     res.render('contactUs',{});
-// })
-
-// // Router for learn more page.
-// router.get("/learnMore", function(req, res){
-//     res.render('learnMore',{});
-// })
-
-// // Router for the Profile Page.
-// router.get("/profile", function(req, res){
-//     res.render('profile', {first_name : req.session.first_name || 'no name', email : req.session.email});
-// });
-
-// router.post("/logout", function(req, res){
-//     req.logout();
-//     req.session.destroy();
-//     res.redirect('/login.html');
-// })
-
-// router.post('/login/register', login.register)
-// router.post('/login/sign_in', login.login)
-
-// function authenticationMiddleware () {
-//   return (req, res, next) => {
-//     console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
-
-//       if (req.isAuthenticated()) return next();
-//       res.redirect('/login.html');
-//   }
-// }
 
 // Export routes for server.js to use.
 module.exports = router;

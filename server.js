@@ -3,6 +3,7 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var expressHandlebars = require("express-handlebars");
+var methodOverride = require("method-override");
 
 // Initialize Express
 var app = express();
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({
 // Make public a static dir
 app.use(express.static("public"));
 
+app.use(methodOverride('_method'));
 
 // Database configuration with mongoose
 mongoose.connect("mongodb://localhost/18mongo");
@@ -30,7 +32,6 @@ db.on("error", function (error) {
 db.once("open", function () {
   console.log("Mongoose connection successful.");
 });
-
 
 app.engine("handlebars", expressHandlebars({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
