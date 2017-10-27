@@ -44,7 +44,8 @@ var routes = require("./controllers/18-mongo-controller.js");
 
 app.use("/", routes);
 
+const PORT=process.env.PORT || 3000;
 // Listen on port 3000
-app.listen(3000, function () {
-  console.log("App running on port 3000!");
+app.listen(PORT, function () {
+  console.log(`App running on port {PORT}!)`;
 });
