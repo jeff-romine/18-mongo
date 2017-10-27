@@ -1,10 +1,24 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Mongoose Scraper</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link" href="/saved">Saved</a>
+      <a class="nav-item nav-link" href="/scrape">Scrape</a>
+    </div>
+  </div>
+</nav>
+
 {{#if articles}}
   <div class="container-fluid">
     <div class="row">
       <table class="table-striped col-lg-12">
         <tbody id="articles">
         {{#each articles}}
-          {{#unless saved}}
             <tr>
               <td class="headline text-center">
                 <div class="headline"><a href="{{url}}"><h2>{{headline}}</h2></a>
@@ -17,7 +31,6 @@
                 {{/if}}
               </td>
             </tr>
-          {{/unless}}
         {{/each}}
         </tbody>
       </table>

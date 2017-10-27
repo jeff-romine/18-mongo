@@ -119,4 +119,21 @@ router.put("/save/:id", (req, res) => {
   });
 });
 
+router.put("/unsave/:id", (req, res) => {
+  "use strict";
+  const id = req.params.id;
+  console.log("id:", id);
+
+  Article.findByIdAndUpdate(id, {saved: false}).then(
+    (result) => {
+      console.log("saved", result);
+      res.redirect("/saved");
+    }
+  ).catch((err) => {
+    console.log("unable to update article with id=", id);
+    res.redirect("/saved");
+  });
+});
+
 module.exports = router;
+
