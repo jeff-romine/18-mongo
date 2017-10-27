@@ -20,7 +20,11 @@ app.use(express.static("public"));
 app.use(methodOverride('_method'));
 
 // Database configuration with mongoose
-mongoose.connect("mongodb://localhost/18mongo");
+
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+mongoose.connect(MONGODB_URI);
+
 var db = mongoose.connection;
 
 // Show any mongoose errors

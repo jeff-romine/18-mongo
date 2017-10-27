@@ -29,9 +29,9 @@ const promiseCallback = (article, articleData, callback) => {
     var newArticle = new Article(articleData);
     newArticle.save()
       .then((article) => {
-      console.log("article saved: " + JSON.stringify(article, null, 2));
-      callback();
-    })
+        console.log("article saved: " + JSON.stringify(article, null, 2));
+        callback();
+      })
       .catch((error) => {
         console.error("unable to save article", articleData, error);
         callback();
@@ -46,14 +46,14 @@ const scrape = (finalCallback) => {
   request("https://www.nytimes.com", (error, response, html) => {
 
     if (error) {
-      console.error("error",error);
+      console.error("error", error);
       finalCallback();
       return;
     }
 
     var $ = cheerio.load(html);
     var promises = [];
-    $("#top-news article").slice(0, 30).each((i,element) => {
+    $("#top-news article").slice(0, 30).each((i, element) => {
       var $storyHeading = $(element).find(".story-heading");
       var headline = $storyHeading.text().trim();
 
@@ -79,7 +79,6 @@ const scrape = (finalCallback) => {
 }
 
 router.get("/", (req, res) => {
-
   Article
     .find({saved: false})
     .limit(20)
@@ -97,23 +96,22 @@ router.get("/saved", (req, res) => {
     .sort('-updatedAt')
     .then((articles) => {
         res.render("saved", {articles: articles});
-      }
-    );
+      });
 });
 
 router.get("/scrape", (req, res) => {
-  scrape( () => res.redirect("/"));
+  scrape(() => res.redirect("/"));
 });
 
 router.put("/save/:id", (req, res) => {
   "use strict";
   const id = req.params.id;
-  console.log("id:",id);
+  console.log("id:", id);
 
-  Article.findByIdAndUpdate(id,{saved: true}).then(
+  Article.findByIdAndUpdate(id, {saved: true}).then(
     (result) => {
-    console.log("saved",result);
-    res.redirect("/");
+      console.log("saved", result);
+      res.redirect("/");
     }
   ).catch((err) => {
     console.log("unable to update article with id=", id);
@@ -121,5 +119,4 @@ router.put("/save/:id", (req, res) => {
   });
 });
 
-// Export routes for server.js to use.
 module.exports = router;
